@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "rf24_rx"
+		},
+		{
+			"name": "rf24_tx",
+			"path": "rf24_tx"
+		}
+	],
+	"settings": {}
+}
