@@ -17,27 +17,28 @@ SPIClass *vspi = NULL;
 
 void Radio_init()
 {
-
+  // 3. Initialize the custom SPI bus on the ESP32-S3 FSPI slot
   vspi = new SPIClass(FSPI);
   vspi->begin(SCK_PIN, MISO_PIN, MOSI_PIN, CSN_PIN);
 
-  // SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, CSN_PIN); // SCK, MISO, MOSI, SS pins
-  if (!radio.begin(vspi)) // Pass the SPI instance to the RF24 constructor
+  // 4. Critical: Tell the RF24 library to use your custom SPI bus
+  if (!radio.begin(vspi))
   {
-    Serial.println("Radio hardware is not responding!");
+    Serial.println("Radio hardware not responding!");
     while (1)
-      ;
+      ; // Halt
   }
 
-  radio.setAutoAck(true);                   // Enable auto acknowledgment
-  radio.setPALevel(RF24_PA_LOW);            // Set the power level to low
-  radio.openReadingPipe(1, 0xF0F0F0F0E1LL); // Set the address for the writing pipe
-  radio.setChannel(channel);
-  radio.setPayloadSize(PAYLOAD_SIZE);
-  radio.setCRCLength(RF24_CRC_DISABLED); // Disable CRC for simplicity
-  radio.startListening();                // Set the module as a receiver
+  radio.setDataRate(RF24_1MBPS);
+  radio.setPALevel(RF24_PA_LOW);
+  radio.setChannel(32);
+  radio.setPayloadSize(32);
+  radio.setCRCLength(RF24_CRC_DISABLED);
+
+  radio.openReadingPipe(1, 0xf0f0f0f0e1LL);
   radio.printPrettyDetails();
   Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
+  radio.startListening();
 }
 
 void printBuffer(const uint8_t *buf, size_t size)

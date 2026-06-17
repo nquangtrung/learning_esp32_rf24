@@ -19,6 +19,7 @@ uint8_t buffer[PAYLOAD_SIZE];
 void setup()
 {
   Serial.begin(115200);
+  delay(1000); // Wait for Serial to initialize
   while (!Serial)
     ;
 
