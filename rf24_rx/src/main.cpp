@@ -30,7 +30,7 @@ void ReceiverTask(void *pvParameters)
   while (1)
   {
     Radio_loop();
-    vTaskDelay(5000 / portTICK_PERIOD_MS); // Adjust the delay as needed
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // Adjust the delay as needed
   }
 }
 

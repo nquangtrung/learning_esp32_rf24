@@ -63,19 +63,70 @@ void fillBuffer(uint8_t *buf, size_t size, uint8_t value)
   }
 }
 
+#define DATA_LENGTH 20
+String data[DATA_LENGTH] = {
+    "Hello, World!",
+    "ESP32-S3 is awesome!",
+    "RF24 library is working!",
+    "Sending data over SPI!",
+    "This is a test message.",
+    "Arduino on ESP32-S3",
+    "C++ programming",
+    "Wireless communication",
+    "IoT projects",
+    "Have a great day!",
+    "Đây là một dòng dữ liệu rất dài, cần phải tách ra làm vài lần để có thể chuyển tiếp toàn bộ, chỉ để test xem có hoạt động đúng không.",
+    "Xin chào, thế giới!",
+    "ESP32-S3 thật tuyệt vời!",
+    "Thư viện RF24 đang hoạt động!",
+    "Gửi dữ liệu qua SPI!",
+    "Đây là một tin nhắn thử nghiệm.",
+    "Arduino trên ESP32-S3",
+    "Lập trình C++",
+    "Giao tiếp không dây",
+    "Dự án IoT"};
+
+char *currentData;
+int currentDataIdx = 0;
 void loop()
 {
   Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
-  fillBuffer(buffer, PAYLOAD_SIZE, random(0, 256)); // Fill buffer with random data
-  printBuffer(buffer, PAYLOAD_SIZE);
-  if (radio.write(buffer, PAYLOAD_SIZE))
+  // if (currentData == "")
+  // {
+  //   currentData = data[currentDataIdx];
+  // }
+  // currentData = data[currentDataIdx];
+
+  if (currentData == nullptr || currentData[0] == '\0')
   {
-    Serial.println("Data sent successfully");
+    currentData = (char *)data[currentDataIdx].c_str();
+  }
+
+  int len = strlen(currentData);
+  Serial.printf("Sending: %s\n", currentData);
+  Serial.printf("Data length: %d\n", len);
+  memset(buffer, 0, PAYLOAD_SIZE); // Clear the buffer before filling
+  if (len > PAYLOAD_SIZE)
+  {
+    memcpy(buffer, currentData, PAYLOAD_SIZE);
+    currentData += PAYLOAD_SIZE;
   }
   else
   {
-    Serial.println("Failed to send data");
+    memcpy(buffer, currentData, len);
+    currentData = nullptr;                               // Mark as sent
+    currentDataIdx = (currentDataIdx + 1) % DATA_LENGTH; // Move to next data
   }
 
-  delay(5000); // Wait for a second before sending the next value
+  printBuffer(buffer, PAYLOAD_SIZE);
+  if (radio.write(buffer, PAYLOAD_SIZE))
+  {
+    Serial.println("Data sent successfully.");
+  }
+  else
+  {
+    Serial.println("Data send failed.");
+  }
+
+  delay(1000); // Wait for a second before sending the next value
 }

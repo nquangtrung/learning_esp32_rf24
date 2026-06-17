@@ -52,6 +52,11 @@ void printBuffer(const uint8_t *buf, size_t size)
   Serial.println();
 }
 
+void clearBuffer(uint8_t *buf, size_t size)
+{
+  memset(buf, 0, size);
+}
+
 String bufferToString(const uint8_t *buf, size_t size)
 {
   String result = "";
@@ -67,9 +72,11 @@ void Radio_loop()
   Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
   if (radio.available())
   {
-    radio.read(buffer, PAYLOAD_SIZE);
-    printBuffer(buffer, PAYLOAD_SIZE);
-    receivedData = bufferToString(buffer, PAYLOAD_SIZE);
+    clearBuffer(buffer, PAYLOAD_SIZE);
+    radio.read(buffer, radio.getPayloadSize());
+    printBuffer(buffer, radio.getPayloadSize());
+    receivedData = "";
+    receivedData = String((char *)buffer);
     Serial.println("Received Data: " + receivedData);
   }
   else
