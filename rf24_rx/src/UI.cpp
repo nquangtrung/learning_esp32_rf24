@@ -6,7 +6,6 @@
 
 LV_FONT_DECLARE(roboto_regular_14)
 lv_obj_t *label;
-lv_obj_t *image;
 
 void UI_init()
 {

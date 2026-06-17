@@ -75,5 +75,4 @@ void previous_rotation()
 void LVGL_loop()
 {
   lv_timer_handler();
-  // delay(5);
 }

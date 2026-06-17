@@ -10,7 +10,7 @@
 #define SCK_PIN 15 // Gray
 #define IRQ_PIN 2  // Blue
 
-RF24 radio(CE_PIN, CSN_PIN); // CE, CSN pins
+RF24 radio(CE_PIN, CSN_PIN, 4000000); // CE, CSN pins, 4MHz SPI speed
 int channel = 32;
 
 #define PAYLOAD_SIZE 32
@@ -40,6 +40,7 @@ void setup()
   radio.setRetries(5, 15);               // Set retries to 5 with a delay of 15ms
 
   radio.printPrettyDetails();
+  Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
 }
 
 void printBuffer(const uint8_t *buf, size_t size)
@@ -63,6 +64,7 @@ void fillBuffer(uint8_t *buf, size_t size, uint8_t value)
 
 void loop()
 {
+  Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
   fillBuffer(buffer, PAYLOAD_SIZE, random(0, 256)); // Fill buffer with random data
   printBuffer(buffer, PAYLOAD_SIZE);
   if (radio.write(buffer, PAYLOAD_SIZE))

@@ -7,16 +7,22 @@
 
 #define PAYLOAD_SIZE 32
 
-RF24 radio(CE_PIN, CSN_PIN); // CE, CSN pins
+RF24 radio(CE_PIN, CSN_PIN, 4000000); // CE, CSN pins, 4MHz SPI speed
 uint8_t buffer[PAYLOAD_SIZE];
 
 int channel = 32;
 String receivedData = "";
 
+SPIClass *vspi = NULL;
+
 void Radio_init()
 {
-  SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, CSN_PIN); // SCK, MISO, MOSI, SS pins
-  if (!radio.begin())
+
+  vspi = new SPIClass(FSPI);
+  vspi->begin(SCK_PIN, MISO_PIN, MOSI_PIN, CSN_PIN);
+
+  // SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, CSN_PIN); // SCK, MISO, MOSI, SS pins
+  if (!radio.begin(vspi)) // Pass the SPI instance to the RF24 constructor
   {
     Serial.println("Radio hardware is not responding!");
     while (1)
@@ -30,8 +36,8 @@ void Radio_init()
   radio.setPayloadSize(PAYLOAD_SIZE);
   radio.setCRCLength(RF24_CRC_DISABLED); // Disable CRC for simplicity
   radio.startListening();                // Set the module as a receiver
-
   radio.printPrettyDetails();
+  Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
 }
 
 void printBuffer(const uint8_t *buf, size_t size)
@@ -57,11 +63,12 @@ String bufferToString(const uint8_t *buf, size_t size)
 
 void Radio_loop()
 {
+  Serial.printf("Radio chip connected: %s\n", radio.isChipConnected() ? "Yes" : "No");
   if (radio.available())
   {
     radio.read(buffer, PAYLOAD_SIZE);
     printBuffer(buffer, PAYLOAD_SIZE);
-    receivedData = "Testing....";
+    receivedData = bufferToString(buffer, PAYLOAD_SIZE);
     Serial.println("Received Data: " + receivedData);
   }
   else

@@ -8,7 +8,7 @@
 
 #define MISO_PIN 5 // Green
 #define MOSI_PIN 2 // Violet
-#define SCK_PIN 0  // Gray
+#define SCK_PIN 7  // Gray
 #define IRQ_PIN 6  // Blue
 
 extern RF24 radio;
@@ -18,3 +18,4 @@ extern String receivedData;
 
 void Radio_init();
 void Radio_loop();
+void printBuffer(const uint8_t *buf, size_t size);
